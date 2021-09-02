@@ -1,4 +1,5 @@
 ﻿using Basket.API.Entities;
+using Basket.API.GrpcServices;
 using Basket.API.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -11,10 +12,12 @@ namespace Basket.API.Controllers
     public class BasketController : ControllerBase
     {
         private readonly IBasketRepository _repository;
+        private readonly DiscountGrpcClientService _discountGrpcClientService;
 
-        public BasketController(IBasketRepository repository)
+        public BasketController(IBasketRepository repository, DiscountGrpcClientService discountGrpcClientService)
         {
             _repository = repository;
+            _discountGrpcClientService = discountGrpcClientService;
         }
 
         [HttpGet("{userName}", Name = "GetBasket")]
@@ -33,6 +36,17 @@ namespace Basket.API.Controllers
         [ProducesResponseType(typeof(ShoppingCart), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<ShoppingCart>> UpdateBasket(ShoppingCart basket)
         {
+            //TODO: Communicate with Discount.Grpc. this is done by connecting the gRPC server application in add connected service  to the client application.
+            //and calculate latest process of product into shopping cart.
+            //consume Discount gRpc. create a new class for this (DiscountGrpcClientService).
+
+            foreach (var item in basket.Items)
+            {
+                //consuming the class we created.
+                var coupon = await _discountGrpcClientService.GetDiscount(item.ProductName);
+                item.Price -= coupon.Amount;
+            }
+
             return Ok(await _repository.UpdateBasket(basket));
         }
 
