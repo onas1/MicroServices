@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Ordering.API.Extensions;
+using Ordering.Infrastructure.Persistence;
 
 namespace Ordering.API
 {
@@ -13,7 +11,16 @@ namespace Ordering.API
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+
+            //calling migration database host extesion method from extension class whic we built.
+            var host = CreateHostBuilder(args).Build();
+            host.MigrateDatabase<OrderContext>((context, services) =>
+            {
+                var logger = services.GetService<ILogger<OrderContextSeed>>();
+                OrderContextSeed.SeedAync(context, logger).Wait();
+            });
+            host.Run();
+
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -21,6 +28,8 @@ namespace Ordering.API
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
+
+                }).UseDefaultServiceProvider(options =>
+                options.ValidateScopes = false);
     }
 }

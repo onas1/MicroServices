@@ -12,13 +12,14 @@ namespace Ordering.Application.Behaviours
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
 
-        public ValidationBehaviour(IEnumerable<IValidator<TRequest>> validotors)
+        public ValidationBehaviour(IEnumerable<IValidator<TRequest>> validators)
         {
-            _validators = validotors;
+            _validators = validators;
         }
         //implementation of validation behaviour using handle method inherited from IPiplineVehaviour<Tr, Trp> class.
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
+
             if (_validators.Any())
             {
                 var context = new ValidationContext<TRequest>(request);

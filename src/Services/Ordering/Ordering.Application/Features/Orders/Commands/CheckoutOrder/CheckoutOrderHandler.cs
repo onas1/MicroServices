@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace Ordering.Application.Features.Orders.Commands.CheckoutOrder
 {
+
+    //IRequestHandler takes two parameter which is the command or query object known as TReqest and the expected response ie what the method returns knows as TResponse.
+    //in this case, the IRequest is a CheckOutOrderCommand model (that inherited MediatR IRequest Interface) and the response is and integer. As seen in the handle method.
     public class CheckoutOrderHandler : IRequestHandler<CheckoutOrderCommand, int>
     {
         private readonly IOrderRepository _repository;

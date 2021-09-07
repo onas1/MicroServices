@@ -1,15 +1,24 @@
 version: '3.4'
 
 services:
+#Adding mongo to container
+
   catalogdb:
     image: mongo
+
+    #Add redis to container
 
   basketdb:
     image: redis:alpine
 
+    #Add postgreSQL to container
 
   discountdb:
     image: postgres
+
+#Add Sql server to container
+  orderdb:
+    image: mcr.microsoft.com/mssql/server
 
   pgadmin:
     image: dpage/pgadmin4
@@ -42,12 +51,19 @@ services:
       context: .
       dockerfile: Services/Discount/Discount.API/Dockerfile
 
+  ordering.api:
+    image: ${DOCKER_REGISTRY-}orderingapi
+    build:
+      context: .
+      dockerfile: Services/Ordering/Ordering.API/Dockerfile
+
 volumes: 
   mongo_data:
   portainer_data:
   postgres_data:
   pgadmin_data:
      
+
 
 
 

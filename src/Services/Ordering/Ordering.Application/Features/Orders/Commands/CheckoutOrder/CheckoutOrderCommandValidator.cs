@@ -2,7 +2,7 @@
 
 namespace Ordering.Application.Features.Orders.Commands.CheckoutOrder
 {
-    //using fluentvalidator nuget package for field validation.. ie pre processor before in mediatR package.
+    //using fluentvalidator"s nuget package abstractValidator class for field validation.. ie pre processor before in mediatR package.
     public class CheckoutOrderCommandValidator : AbstractValidator<CheckoutOrderCommand>
     {
         public CheckoutOrderCommandValidator()
