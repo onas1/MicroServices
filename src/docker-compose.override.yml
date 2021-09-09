@@ -27,7 +27,7 @@ services:
     - "5432:5432"
     volumes:
         - postgres_data:/var/lib/postgresql/data/
- #sql db container setup. name of our sql db = orderdb
+ #sql db container configuration setup. name of our sql  db = orderdb
   orderdb:
     container_name: orderdb
     environment:
@@ -36,6 +36,16 @@ services:
     restart: always
     ports:
      - "1433:1433"
+
+#first port if for rabbitmq and second port is for rabbit mq dashboard
+#rabbitmq configuration set up
+  rabbitmq:
+     container_name: rabbitmq
+     restart: always
+     ports:
+     - "5672:5672"
+     - "15672:15672"
+
 
   pgadmin:
     container_name: pgadmin

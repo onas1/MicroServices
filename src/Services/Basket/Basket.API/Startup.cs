@@ -1,6 +1,7 @@
 using Basket.API.GrpcServices;
 using Basket.API.Repositories;
 using Discount.Grpc.Protos;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -25,11 +26,33 @@ namespace Basket.API
         {
 
 
-            //configuring and adding redis caching to service container
+            //redis configuring and adding caching to service container
             services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = Configuration.GetValue<string>("CacheSettings:ConnectionString");
             });
+            //general service registration
+            services.AddScoped<IBasketRepository, BasketRepository>();
+            services.AddAutoMapper(typeof(Startup));
+
+
+            //registering protocol buffer generated class and specifying address from where Grpc call is been made from.
+            services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(options => options.Address = new Uri(Configuration.GetSection("GrpcSettings:DiscountUrl").Value));
+
+            //registering gRPC service in start up.
+            services.AddScoped<DiscountGrpcClientService>();
+
+
+            //MassTransit-RabbitMQ Configuration for perform async communication
+            services.AddMassTransit(config =>
+            {
+                config.UsingRabbitMq((ctx, cfg) =>
+                { //rabbitmq uses ampq protocol instead of http protocol and config is amqp://username:password@servername:rabbitmq port.
+                    //and we use configuration to get host address so that we can override it in docker env.
+                    cfg.Host(Configuration["EventBusSettings:HostAddress"]);
+                });
+            });
+            services.AddMassTransitHostedService();
 
             services.AddControllers();
             services.AddScoped<IBasketRepository, BasketRepository>();
@@ -37,15 +60,6 @@ namespace Basket.API
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Basket.API", Version = "v1" });
             });
-
-            //registering protocol buffer generated class and specifying address from where Grpc call is been made from.
-            services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(options => options.Address = new Uri(Configuration.GetSection("GrpcSettings:DiscountUrl").Value));
-
-
-            services.AddScoped<DiscountGrpcClientService>();
-
-
-            services.AddScoped<IBasketRepository, BasketRepository>();
 
         }
 
