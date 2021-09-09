@@ -89,9 +89,12 @@ services:
       - "CacheSettings:ConnectionString=basketdb:6379"
       #also remember to override grpc enviroment configuration from basket appsetting. 
       - "GrpcSettings:DiscountUrl=http://discount.grpc"
+            #also remember to override rabbitMq host address in enviroment configuration from basket appsetting. 
+      - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
 
     depends_on:
       - basketdb
+      - rabbitmq
     ports:
       - "8001:80"
 
@@ -126,8 +129,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "ConnectionStrings:OrderingConnectionString=Server=orderdb;Database=OrderDb;Integrated Security=false;User Id=sa;Password=On@12345678;"
+        #also remember to override rabbitMq host address in enviroment configuration from basket appsetting. 
+      - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
     depends_on:
       - orderdb
+      - rabbitmq
     ports:
       - "8004:80"
 
