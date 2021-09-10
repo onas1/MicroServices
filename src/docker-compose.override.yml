@@ -100,7 +100,7 @@ services:
 
 
   discount.grpc:
-    container_name: discount_grpc
+    container_name: discount.grpc
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "DatabaseSettings:ConnectionString=Server=discountdb;Port=5432;Database=DiscountDb;User Id=admin;Password=admin1234;"
@@ -111,7 +111,7 @@ services:
 
 
   discount.api:
-    container_name: discount_api
+    container_name: discount.api
 
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -125,7 +125,7 @@ services:
  
 
   ordering.api:
-    container_name: ordering_api
+    container_name: ordering.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "ConnectionStrings:OrderingConnectionString=Server=orderdb;Database=OrderDb;Integrated Security=false;User Id=sa;Password=On@12345678;"
@@ -137,3 +137,16 @@ services:
     ports:
       - "8004:80"
 
+
+
+  ocelotapigw:
+    container_name: ocelotapigw
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - catalog.api
+      - basket.api
+      - discount.api
+      - ordering.api
+    ports:
+      - "8010:80"
